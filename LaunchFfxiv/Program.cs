@@ -8,7 +8,7 @@ using Newtonsoft.Json;
 
 public class Program
 {
-    private const string KCfgFile = "Launcher.json";
+    private const string KCfgFile = "LaunchFfxivConfig.json";
     private static Config? config;
 
     public static Config Config => config ??= GetConfig();
@@ -38,16 +38,6 @@ public class Program
                 }
             }
 
-            Console.WriteLine("Enter RPCAPD path [rpcapd]:");
-            read = Console.ReadLine();
-            if (!string.IsNullOrEmpty(read))
-                Config.RpcapdPath = read;
-            
-            Console.WriteLine("Enter IINACT path [~/IINACT.exe]:");
-            read = Console.ReadLine();
-            if (!string.IsNullOrEmpty(read))
-                Config.IinactPath = read;
-
             if (!Config.FlatpakLauncher)
             {
                 Console.WriteLine($"Enter XlCore path [~/.wine/drive_c/users/{Environment.UserName}/AppData/Local/XIVLauncher/XIVLauncher.exe]:");
@@ -66,7 +56,10 @@ public class Program
                     Console.WriteLine("Enter WINEPREFIX path [~/.wine]:");
                     read = Console.ReadLine();
                     if (!string.IsNullOrEmpty(read))
+                    {
                         Config.WinePrefixPath = read;
+                        Config.IinactPath = Config.IinactPath.Replace("WINEPREFIX", read);
+                    }
 
                     Console.WriteLine("Use ESYNC? [Y/n]: ");
                     read = Console.ReadLine();
@@ -138,10 +131,15 @@ public class Program
                 }
             }
 
-            Console.WriteLine("Enter DotnetBundle extract Dir [/tmp]:");
+            Console.WriteLine("Enter RPCAPD path [rpcapd]:");
             read = Console.ReadLine();
             if (!string.IsNullOrEmpty(read))
-                Config.DotnetBundlePath = read;
+                Config.RpcapdPath = read;
+            
+            Console.WriteLine("Enter IINACT path [WINEPREFIX/drive_c/IINACT.exe]:");
+            read = Console.ReadLine();
+            if (!string.IsNullOrEmpty(read))
+                Config.IinactPath = read;
 
             Console.WriteLine("Are there any WINE DLL overrides you wish to use? (Define them all in a space-seperated list) (use 'none' to remove the default setting) [wpcap=n]:");
             read = Console.ReadLine();
@@ -170,9 +168,15 @@ public class Program
 
     private static void StartProcesses()
     {
+        MakeFilepathsUsable();
+        SaveConfig();
         Log.Info("Startup", "Starting XLCore");
         if (Config.XlCorePath.EndsWith(".exe")) // Determine if we are using the windows version of XIVLauncher inside of WINE, or the native launcher
+        {
+            Config.IinactPath = Config.IinactPath.Replace("WINEPREFIX", Config.WinePrefixPath);
+            SaveConfig();
             Process.Start(SetupWineProcessInfo(Config.XlCorePath));
+        }
         else // If we're using the native launcher, we want to make sure our WINE usage matches the launcher's to make everything work
         {
             string launcherConfig = Path.Combine(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".xlcore"), "launcher.ini");
@@ -213,6 +217,7 @@ public class Program
             }
 
             Config.WinePrefixPath = Path.Combine(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".xlcore"), "wineprefix");
+            Config.IinactPath = Config.IinactPath.Replace("WINEPREFIX", Config.WinePrefixPath);
             SaveConfig();
 
             if (Config.FlatpakLauncher)
@@ -246,7 +251,7 @@ public class Program
 
         Log.Info("Startup", "Starting IINACT");
         ProcessStartInfo iinactInfo = SetupWineProcessInfo(Config.IinactPath);
-        iinactInfo.EnvironmentVariables["DOTNET_BUNDLE_EXTRACT_BASE_DIR"] = Config.DotnetBundlePath; // dotnet6 apps require this env variable to be set. For some reason, WINE is not properly inheriting the default location when this env variable is not set.
+        iinactInfo.EnvironmentVariables["DOTNET_BUNDLE_EXTRACT_BASE_DIR"] = ""; // dotnet6 apps require this env variable to be set. For some reason, WINE is not properly inheriting the default location when this env variable is not set.
         Process? iinact = Process.Start(iinactInfo);
         
         iinact?.WaitForExit(); // Wait for IINACT to die, before killing rpcapd
@@ -262,8 +267,6 @@ public class Program
             Config.RpcapdPath = Config.RpcapdPath.Replace("~", Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
         if (Config.WinePath.Contains("~/"))
             Config.WinePath = Config.RpcapdPath.Replace("~", Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
-        if (Config.DotnetBundlePath.Contains("~/"))
-            Config.DotnetBundlePath = Config.DotnetBundlePath.Replace("~", Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
         if (Config.XlCorePath.Contains("~/"))
             Config.XlCorePath = Config.XlCorePath.Replace("~", Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
         if (Config.WinePrefixPath.Contains("~/"))
@@ -297,13 +300,13 @@ public class Program
         return overrides;
     }
 
-    private static void SaveConfig() => File.WriteAllText(Path.Combine(AppContext.BaseDirectory, KCfgFile), JsonConvert.SerializeObject(Config, Formatting.Indented));
+    private static void SaveConfig() => File.WriteAllText(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), KCfgFile), JsonConvert.SerializeObject(Config, Formatting.Indented));
 
     private static Config GetConfig()
     {
-        if (File.Exists(Path.Combine(AppContext.BaseDirectory, KCfgFile)))
-            return JsonConvert.DeserializeObject<Config>(File.ReadAllText(KCfgFile))!;
-        File.WriteAllText(Path.Combine(AppContext.BaseDirectory, KCfgFile), JsonConvert.SerializeObject(Config.Default, Formatting.Indented));
+        if (File.Exists(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), KCfgFile)))
+            return JsonConvert.DeserializeObject<Config>(File.ReadAllText(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), KCfgFile)))!;
+        File.WriteAllText(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), KCfgFile), JsonConvert.SerializeObject(Config.Default, Formatting.Indented));
         return Config.Default;
     }
 }

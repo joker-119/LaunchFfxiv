@@ -8,11 +8,9 @@ public class Config
 
     public string RpcapdPath { get; set; } = "rpcapd";
 
-    public string IinactPath { get; set; } = "~/IINACT.exe";
+    public string IinactPath { get; set; } = "WINEPREFIX/drive_c/IINACT.exe";
 
     public string XlCorePath { get; set; } = string.Empty;
-
-    public string DotnetBundlePath { get; set; } = "/tmp";
 
     public bool WineEsync { get; set; } = true;
 
@@ -22,10 +20,7 @@ public class Config
 
     public bool DisableDxvkLogs { get; set; } = true;
 
-    public List<string> WineDllOverrides { get; set; } = new()
-    {
-        "wpcap=n",
-    };
+    public List<string> WineDllOverrides { get; set; } = new();
 
     public bool Debug { get; set; } = false;
 
