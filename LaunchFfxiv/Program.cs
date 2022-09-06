@@ -15,7 +15,7 @@ public class Program
     public static void Main(string[] args)
     {
         // This is long and I hate it and would love a better, simpler way of handling this
-        if (Config == Config.Default)
+        if (Config == Config.Default || args.Any(s => s == "--setup"))
         {
             string? read = null;
             Log.Warn("Startup", "Default config detected, preforming first time setup.");
