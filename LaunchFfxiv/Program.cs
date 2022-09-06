@@ -15,6 +15,7 @@ public class Program
 
     public static void Main(string[] args)
     {
+        Log.Info("Program", $"Welcome to funny launch wrapper {Assembly.GetExecutingAssembly().GetName().Version}!");
         // This is long and I hate it and would love a better, simpler way of handling this
         if (Config == Config.Default || args.Any(s => s == "--setup"))
         {
