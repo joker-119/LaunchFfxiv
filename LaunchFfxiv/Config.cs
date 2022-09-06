@@ -10,7 +10,7 @@ public class Config
 
     public string IinactPath { get; set; } = "~/IINACT.exe";
 
-    public string XlCorePath { get; set; } = "~/.wine/drive_c/users/Joker/AppData/Local/XIVLauncher/XIVLauncher.exe";
+    public string XlCorePath { get; set; } = "XIVLauncher.Core";
 
     public string DotnetBundlePath { get; set; } = "/tmp";
 
