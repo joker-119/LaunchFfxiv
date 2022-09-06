@@ -2,6 +2,7 @@
 
 using System.Diagnostics;
 using System.Net;
+using System.Reflection;
 
 using Newtonsoft.Json;
 
@@ -234,13 +235,13 @@ public class Program
         return startInfo;
     }
 
-    private static void SaveConfig() => File.WriteAllText(KCfgFile, JsonConvert.SerializeObject(Config, Formatting.Indented));
+    private static void SaveConfig() => File.WriteAllText(Path.Combine(Assembly.GetExecutingAssembly().Location, KCfgFile), JsonConvert.SerializeObject(Config, Formatting.Indented));
 
     private static Config GetConfig()
     {
-        if (File.Exists(KCfgFile))
+        if (File.Exists(Path.Combine(Assembly.GetExecutingAssembly().Location, KCfgFile)))
             return JsonConvert.DeserializeObject<Config>(File.ReadAllText(KCfgFile))!;
-        File.WriteAllText(KCfgFile, JsonConvert.SerializeObject(Config.Default, Formatting.Indented));
+        File.WriteAllText(Path.Combine(Assembly.GetExecutingAssembly().Location, KCfgFile), JsonConvert.SerializeObject(Config.Default, Formatting.Indented));
         return Config.Default;
     }
 }
