@@ -55,82 +55,85 @@ public class Program
                 read = Console.ReadLine();
                 if (!string.IsNullOrEmpty(read))
                     Config.XlCorePath = read;
-                
-                Console.WriteLine("Enter WINE binary path [wine]:");
-                read = Console.ReadLine();
-                if (!string.IsNullOrEmpty(read))
-                    Config.WinePath = read;
 
-                Console.WriteLine("Enter WINEPREFIX path [~/.wine]:");
-                read = Console.ReadLine();
-                if (!string.IsNullOrEmpty(read))
-                    Config.WinePrefixPath = read;
-
-                Console.WriteLine("Use ESYNC? [Y/n]: ");
-                read = Console.ReadLine();
-                if (!string.IsNullOrEmpty(read))
+                if (Config.XlCorePath.EndsWith(".exe"))
                 {
-                    switch (read.ToLower())
+                    Console.WriteLine("Enter WINE binary path [wine]:");
+                    read = Console.ReadLine();
+                    if (!string.IsNullOrEmpty(read))
+                        Config.WinePath = read;
+
+                    Console.WriteLine("Enter WINEPREFIX path [~/.wine]:");
+                    read = Console.ReadLine();
+                    if (!string.IsNullOrEmpty(read))
+                        Config.WinePrefixPath = read;
+
+                    Console.WriteLine("Use ESYNC? [Y/n]: ");
+                    read = Console.ReadLine();
+                    if (!string.IsNullOrEmpty(read))
                     {
-                        case "y":
-                        case "yes":
-                            Config.WineEsync = true;
-                            break;
-                        case "n":
-                        case "no":
-                            Config.WineEsync = false;
-                            break;
+                        switch (read.ToLower())
+                        {
+                            case "y":
+                            case "yes":
+                                Config.WineEsync = true;
+                                break;
+                            case "n":
+                            case "no":
+                                Config.WineEsync = false;
+                                break;
+                        }
                     }
-                }
 
-                Console.WriteLine("Use FSYNC? [Y/n]: ");
-                read = Console.ReadLine();
-                if (!string.IsNullOrEmpty(read))
-                {
-                    switch (read.ToLower())
+                    Console.WriteLine("Use FSYNC? [Y/n]: ");
+                    read = Console.ReadLine();
+                    if (!string.IsNullOrEmpty(read))
                     {
-                        case "y":
-                        case "yes":
-                            Config.WineFsync = true;
-                            break;
-                        case "n":
-                        case "no":
-                            Config.WineFsync = false;
-                            break;
+                        switch (read.ToLower())
+                        {
+                            case "y":
+                            case "yes":
+                                Config.WineFsync = true;
+                                break;
+                            case "n":
+                            case "no":
+                                Config.WineFsync = false;
+                                break;
+                        }
                     }
-                }
 
-                Console.WriteLine("Disable WINE logs? [Y/n]: ");
-                read = Console.ReadLine();
-                if (!string.IsNullOrEmpty(read))
-                {
-                    switch (read.ToLower())
+                    Console.WriteLine("Disable WINE logs? [Y/n]: ");
+                    read = Console.ReadLine();
+                    if (!string.IsNullOrEmpty(read))
                     {
-                        case "y":
-                        case "yes":
-                            Config.DisableWineLogs = true;
-                            break;
-                        case "n":
-                        case "no":
-                            Config.DisableWineLogs = false;
-                            break;
+                        switch (read.ToLower())
+                        {
+                            case "y":
+                            case "yes":
+                                Config.DisableWineLogs = true;
+                                break;
+                            case "n":
+                            case "no":
+                                Config.DisableWineLogs = false;
+                                break;
+                        }
                     }
-                }
 
-                Console.WriteLine("Disable DXVK logs? [Y/n]:");
-                read = Console.ReadLine();
-                if (!string.IsNullOrEmpty(read))
-                {
-                    switch (read.ToLower())
+                    Console.WriteLine("Disable DXVK logs? [Y/n]:");
+                    read = Console.ReadLine();
+                    if (!string.IsNullOrEmpty(read))
                     {
-                        case "y":
-                        case "yes":
-                            Config.DisableDxvkLogs = true;
-                            break;
-                        case "n":
-                        case "no":
-                            Config.DisableDxvkLogs = false;
-                            break;
+                        switch (read.ToLower())
+                        {
+                            case "y":
+                            case "yes":
+                                Config.DisableDxvkLogs = true;
+                                break;
+                            case "n":
+                            case "no":
+                                Config.DisableDxvkLogs = false;
+                                break;
+                        }
                     }
                 }
             }
