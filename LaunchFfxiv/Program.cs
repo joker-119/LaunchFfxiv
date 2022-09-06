@@ -20,16 +20,24 @@ public class Program
         {
             string? read = null;
             Log.Warn("Startup", "Default config detected, preforming first time setup.");
-            Console.WriteLine("Enter WINE binary path [wine]:");
-            read = Console.ReadLine();
-            if (!string.IsNullOrEmpty(read))
-                Config.WinePath = read;
-
-            Console.WriteLine("Enter WINEPREFIX path [~/.wine]:");
-            read = Console.ReadLine();
-            if (!string.IsNullOrEmpty(read))
-                Config.WinePrefixPath = read;
             
+            Console.WriteLine("Do you use the flatpak XIV launcher? (Likely yes on SteamDeck) [Y/n]: ");
+            read = Console.ReadLine();
+            if (!string.IsNullOrEmpty(read))
+            {
+                switch (read.ToLower())
+                {
+                    case "y":
+                    case "yes":
+                        Config.FlatpakLauncher = true;
+                        break;
+                    case "n":
+                    case "no":
+                        Config.FlatpakLauncher = false;
+                        break;
+                }
+            }
+
             Console.WriteLine("Enter RPCAPD path [rpcapd]:");
             read = Console.ReadLine();
             if (!string.IsNullOrEmpty(read))
@@ -39,85 +47,99 @@ public class Program
             read = Console.ReadLine();
             if (!string.IsNullOrEmpty(read))
                 Config.IinactPath = read;
-            
-            Console.WriteLine("Enter XlCore path [~/.wine/drive_c/users/$(whoami)/AppData/Local/XIVLauncher/XIVLauncher.exe]:");
-            read = Console.ReadLine();
-            if (!string.IsNullOrEmpty(read))
-                Config.XlCorePath = read;
+
+            if (!Config.FlatpakLauncher)
+            {
+                Console.WriteLine($"Enter XlCore path [~/.wine/drive_c/users/{Environment.UserName}/AppData/Local/XIVLauncher/XIVLauncher.exe]:");
+                Config.XlCorePath = $"~/.wine/drive_c/users/{Environment.UserName}/AppData/Local/XIVLauncher/XIVLauncher.exe";
+                read = Console.ReadLine();
+                if (!string.IsNullOrEmpty(read))
+                    Config.XlCorePath = read;
+                
+                Console.WriteLine("Enter WINE binary path [wine]:");
+                read = Console.ReadLine();
+                if (!string.IsNullOrEmpty(read))
+                    Config.WinePath = read;
+
+                Console.WriteLine("Enter WINEPREFIX path [~/.wine]:");
+                read = Console.ReadLine();
+                if (!string.IsNullOrEmpty(read))
+                    Config.WinePrefixPath = read;
+
+                Console.WriteLine("Use ESYNC? [Y/n]: ");
+                read = Console.ReadLine();
+                if (!string.IsNullOrEmpty(read))
+                {
+                    switch (read.ToLower())
+                    {
+                        case "y":
+                        case "yes":
+                            Config.WineEsync = true;
+                            break;
+                        case "n":
+                        case "no":
+                            Config.WineEsync = false;
+                            break;
+                    }
+                }
+
+                Console.WriteLine("Use FSYNC? [Y/n]: ");
+                read = Console.ReadLine();
+                if (!string.IsNullOrEmpty(read))
+                {
+                    switch (read.ToLower())
+                    {
+                        case "y":
+                        case "yes":
+                            Config.WineFsync = true;
+                            break;
+                        case "n":
+                        case "no":
+                            Config.WineFsync = false;
+                            break;
+                    }
+                }
+
+                Console.WriteLine("Disable WINE logs? [Y/n]: ");
+                read = Console.ReadLine();
+                if (!string.IsNullOrEmpty(read))
+                {
+                    switch (read.ToLower())
+                    {
+                        case "y":
+                        case "yes":
+                            Config.DisableWineLogs = true;
+                            break;
+                        case "n":
+                        case "no":
+                            Config.DisableWineLogs = false;
+                            break;
+                    }
+                }
+
+                Console.WriteLine("Disable DXVK logs? [Y/n]:");
+                read = Console.ReadLine();
+                if (!string.IsNullOrEmpty(read))
+                {
+                    switch (read.ToLower())
+                    {
+                        case "y":
+                        case "yes":
+                            Config.DisableDxvkLogs = true;
+                            break;
+                        case "n":
+                        case "no":
+                            Config.DisableDxvkLogs = false;
+                            break;
+                    }
+                }
+            }
 
             Console.WriteLine("Enter DotnetBundle extract Dir [/tmp]:");
             read = Console.ReadLine();
             if (!string.IsNullOrEmpty(read))
                 Config.DotnetBundlePath = read;
-            
-            Console.WriteLine("Use ESYNC? [Y/n]: ");
-            read = Console.ReadLine();
-            if (!string.IsNullOrEmpty(read))
-            {
-                switch (read.ToLower())
-                {
-                    case "y":
-                    case "yes":
-                        Config.WineEsync = true;
-                        break;
-                    case "n":
-                    case "no":
-                        Config.WineEsync = false;
-                        break;
-                }
-            }
-            
-            Console.WriteLine("Use FSYNC? [Y/n]: ");
-            read = Console.ReadLine();
-            if (!string.IsNullOrEmpty(read))
-            {
-                switch (read.ToLower())
-                {
-                    case "y":
-                    case "yes":
-                        Config.WineFsync = true;
-                        break;
-                    case "n":
-                    case "no":
-                        Config.WineFsync = false;
-                        break;
-                }
-            }
 
-            Console.WriteLine("Disable WINE logs? [Y/n]: ");
-            read = Console.ReadLine();
-            if (!string.IsNullOrEmpty(read))
-            {
-                switch (read.ToLower())
-                {
-                    case "y":
-                    case "yes":
-                        Config.DisableWineLogs = true;
-                        break;
-                    case "n":
-                    case "no":
-                        Config.DisableWineLogs = false;
-                        break;
-                }
-            }
-
-            Console.WriteLine("Disable DXVK logs? [Y/n]:");
-            read = Console.ReadLine();
-            if (!string.IsNullOrEmpty(read))
-            {
-                switch (read.ToLower())
-                {
-                    case "y":
-                    case "yes":
-                        Config.DisableDxvkLogs = true;
-                        break;
-                    case "n":
-                    case "no":
-                        Config.DisableDxvkLogs = false;
-                        break;
-                }
-            }
-            
             Console.WriteLine("Are there any WINE DLL overrides you wish to use? (Define them all in a space-seperated list) (use 'none' to remove the default setting) [wpcap=n]:");
             read = Console.ReadLine();
             if (!string.IsNullOrEmpty(read))
@@ -127,7 +149,8 @@ public class Program
                 {
                     string[] split = read.Split(' ');
                     foreach (string s in split)
-                        Config.WineDllOverrides.Add(s);
+                        if (!Config.WineDllOverrides.Contains(s))
+                            Config.WineDllOverrides.Add(s);
                 }
             }
             
@@ -187,7 +210,11 @@ public class Program
             
             Config.WinePrefixPath = Path.Combine(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".xlcore"), "wineprefix");
             SaveConfig();
-            Process.Start(Config.XlCorePath);
+
+            if (Config.FlatpakLauncher)
+                Process.Start("flatpak", "run --branch=stable --arch=x86_64 --command=xivlauncher dev.goats.xivlauncher");
+            else
+                Process.Start(Config.XlCorePath);
         }
         
         Log.Info("Startup", "Starting RPCAPD");
@@ -225,6 +252,8 @@ public class Program
         startInfo.EnvironmentVariables["WINEESYNC"] = Config.WineEsync ? "1" : "0";
         startInfo.EnvironmentVariables["WINEFSYNC"] = Config.WineFsync ? "1" : "0";
         startInfo.EnvironmentVariables["WINEPREFIX"] = Config.WinePrefixPath;
+        if (Config.WineDllOverrides.Count > 0)
+            startInfo.EnvironmentVariables["WINEDLLOVERRIDES"] = GetDllOverrides();
         if (Config.DisableWineLogs)
             startInfo.EnvironmentVariables["WINEDEBUG"] = "-all";
         if (Config.DisableDxvkLogs)
@@ -235,13 +264,22 @@ public class Program
         return startInfo;
     }
 
-    private static void SaveConfig() => File.WriteAllText(Path.Combine(Assembly.GetExecutingAssembly().Location, KCfgFile), JsonConvert.SerializeObject(Config, Formatting.Indented));
+    private static string GetDllOverrides()
+    {
+        string overrides = string.Empty;
+        foreach (string s in Config.WineDllOverrides)
+            overrides += $"{s} ";
+        overrides = overrides.TrimEnd(' ');
+        return overrides;
+    }
+
+    private static void SaveConfig() => File.WriteAllText(Path.Combine(AppContext.BaseDirectory, KCfgFile), JsonConvert.SerializeObject(Config, Formatting.Indented));
 
     private static Config GetConfig()
     {
-        if (File.Exists(Path.Combine(Assembly.GetExecutingAssembly().Location, KCfgFile)))
+        if (File.Exists(Path.Combine(AppContext.BaseDirectory, KCfgFile)))
             return JsonConvert.DeserializeObject<Config>(File.ReadAllText(KCfgFile))!;
-        File.WriteAllText(Path.Combine(Assembly.GetExecutingAssembly().Location, KCfgFile), JsonConvert.SerializeObject(Config.Default, Formatting.Indented));
+        File.WriteAllText(Path.Combine(AppContext.BaseDirectory, KCfgFile), JsonConvert.SerializeObject(Config.Default, Formatting.Indented));
         return Config.Default;
     }
 }

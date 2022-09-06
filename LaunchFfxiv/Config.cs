@@ -10,7 +10,7 @@ public class Config
 
     public string IinactPath { get; set; } = "~/IINACT.exe";
 
-    public string XlCorePath { get; set; } = "XIVLauncher.Core";
+    public string XlCorePath { get; set; } = string.Empty;
 
     public string DotnetBundlePath { get; set; } = "/tmp";
 
@@ -28,6 +28,8 @@ public class Config
     };
 
     public bool Debug { get; set; } = false;
+
+    public bool FlatpakLauncher { get; set; } = true;
 
     public static readonly Config Default = new();
 }
