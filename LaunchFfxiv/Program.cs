@@ -183,9 +183,9 @@ public class Program
                         break;
                 }
             }
-
-            SaveConfig();
+            
             Config.WinePrefixPath = Path.Combine(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".xlcore"), "wineprefix");
+            SaveConfig();
             Process.Start(Config.XlCorePath);
         }
         
