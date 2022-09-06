@@ -172,7 +172,7 @@ public class Program
             Process.Start(SetupWineProcessInfo(Config.XlCorePath));
         else // If we're using the native launcher, we want to make sure our WINE usage matches the launcher's to make everything work
         {
-            string launcherConfig = Path.Combine(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".xlcore"), "launcher.ini"); 
+            string launcherConfig = Path.Combine(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".xlcore"), "launcher.ini");
             if (!File.Exists(launcherConfig))
             {
                 Log.Error("Startup - XLCORE", $"Native XLCore detected, but unable to load XLCore Launcher ini file from {launcherConfig}. Please run XLCore once first to generate it's config.");
@@ -185,10 +185,10 @@ public class Program
             {
                 switch (s)
                 {
-                    case {} when s.StartsWith("ESyncEnabled"): // Set our Esync usage to match the launcher
+                    case { } when s.StartsWith("ESyncEnabled"): // Set our Esync usage to match the launcher
                         Config.WineEsync = s.EndsWith("true");
                         break;
-                    case {} when s.StartsWith("FSyncEnabled"): // Set out Fsync usage to match the launcher
+                    case { } when s.StartsWith("FSyncEnabled"): // Set out Fsync usage to match the launcher
                         Config.WineFsync = s.EndsWith("true");
                         break;
                     case { } when s.StartsWith("WineStartupType") && s.EndsWith("Managed"): // If the launcher is managing wine for the game client, we need to change our wine binary path to be the same as what's used by the launcher
@@ -199,6 +199,7 @@ public class Program
                             Log.Info("Startup - XLCORE", Config.WinePath);
                             break;
                         }
+
                         break;
                     case { } when s.StartsWith("WineBinaryPath") && !changedWinePath: // If we haven't changed the wine path because it's managed by launcher, we need to set our wine path to the custom path defined in launcher config.
                         string path = Path.Combine(s.Substring(s.IndexOf('=') + 1), "wine");
@@ -207,23 +208,43 @@ public class Program
                         break;
                 }
             }
-            
+
             Config.WinePrefixPath = Path.Combine(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".xlcore"), "wineprefix");
             SaveConfig();
 
             if (Config.FlatpakLauncher)
-                Process.Start("flatpak", "run --branch=stable --arch=x86_64 --command=xivlauncher dev.goats.xivlauncher");
+            {
+                ProcessStartInfo info = new();
+                info.Arguments = "run --branch=stable --arch=x86_64 --command=xivlauncher dev.goats.xivlauncher";
+                info.FileName = "flatpak";
+                info.RedirectStandardOutput = true;
+                info.RedirectStandardError = true;
+                Process.Start(info);
+            }
             else
-                Process.Start(Config.XlCorePath);
+            {
+                ProcessStartInfo info = new();
+                info.FileName = Config.XlCorePath;
+                info.RedirectStandardOutput = true;
+                info.RedirectStandardError = true;
+                Process.Start(info);
+            }
         }
         
         Log.Info("Startup", "Starting RPCAPD");
-        Process.Start(Config.RpcapdPath, "-l localhost -n"); // Listen on localhost only with no password auth.
+        try
+        {
+            Process.Start(Config.RpcapdPath, "-l localhost -n"); // Listen on localhost only with no password auth.
+        }
+        catch (Exception)
+        {
+            Log.Warn("Startup - RPCAPD", "Failed to start rpcapd. You may experience issues with iinact.");
+        }
 
         Log.Info("Startup", "Starting IINACT");
-        ProcessStartInfo info = SetupWineProcessInfo(Config.IinactPath);
-        info.EnvironmentVariables["DOTNET_BUNDLE_EXTRACT_BASE_DIR"] = Config.DotnetBundlePath; // dotnet6 apps require this env variable to be set. For some reason, WINE is not properly inheriting the default location when this env variable is not set.
-        Process? iinact = Process.Start(info);
+        ProcessStartInfo iinactInfo = SetupWineProcessInfo(Config.IinactPath);
+        iinactInfo.EnvironmentVariables["DOTNET_BUNDLE_EXTRACT_BASE_DIR"] = Config.DotnetBundlePath; // dotnet6 apps require this env variable to be set. For some reason, WINE is not properly inheriting the default location when this env variable is not set.
+        Process? iinact = Process.Start(iinactInfo);
         
         iinact?.WaitForExit(); // Wait for IINACT to die, before killing rpcapd
         Process.Start("pkill", "-9 rpcapd");
