@@ -18,12 +18,11 @@ Launch wrapper that launches XLCore/XIVLauncher, IINACT and RPCAPD for you with 
 
 
 %build
-nuget restore
 dotnet publish -r linux-x64 -c Release -p:PublishReadyToRun=true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true --self-contained true
 
 
 %install
-%mv LaunchFfxiv/bin/Release/net6.0/linux-x64/publish/LaunchFfxiv /opt
+mv LaunchFfxiv/bin/Release/net6.0/linux-x64/publish/LaunchFfxiv /opt
 
 
 %files
