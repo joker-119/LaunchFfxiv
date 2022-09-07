@@ -226,16 +226,12 @@ public class Program
                 ProcessStartInfo info = new();
                 info.Arguments = "run --branch=stable --arch=x86_64 --command=xivlauncher dev.goats.xivlauncher";
                 info.FileName = "flatpak";
-                info.RedirectStandardOutput = true;
-                info.RedirectStandardError = true;
                 Process.Start(info);
             }
             else
             {
                 ProcessStartInfo info = new();
                 info.FileName = Config.XlCorePath;
-                info.RedirectStandardOutput = true;
-                info.RedirectStandardError = true;
                 Process.Start(info);
             }
         }
@@ -254,6 +250,35 @@ public class Program
         ProcessStartInfo iinactInfo = SetupWineProcessInfo(Config.IinactPath);
         iinactInfo.EnvironmentVariables["DOTNET_BUNDLE_EXTRACT_BASE_DIR"] = ""; // dotnet6 apps require this env variable to be set. For some reason, WINE is not properly inheriting the default location when this env variable is not set.
         Process? iinact = Process.Start(iinactInfo);
+        
+        Log.Info("Startup", "Starting auto-run processes..");
+        foreach (string autoRun in Config.AutoRun)
+        {
+            try
+            {
+                if (autoRun.EndsWith(".exe"))
+                    Process.Start(SetupWineProcessInfo(autoRun));
+                else
+                {
+                    if (autoRun.Contains(' '))
+                    {
+                        string[] split = autoRun.Split(' ');
+                        string args = string.Empty;
+                        foreach (string s in split.Skip(1))
+                            args += $"{s} ";
+                        args = args.TrimEnd(' ');
+                        Process.Start(split[0], args);
+                    }
+                    else
+                        Process.Start(autoRun);
+                }
+            }
+            catch (Exception e)
+            {
+                Log.Error("Startup - AUTORUN", $"Unable to start {autoRun}. {e.Message}\nEnable debug for more info.");
+                Log.Debug("Startup - AUTORUN", e);
+            }
+        }
         
         iinact?.WaitForExit(); // Wait for IINACT to die, before killing rpcapd
         Process.Start("pkill", "-9 rpcapd");

@@ -10,6 +10,8 @@ public class Config
 
     public string IinactPath { get; set; } = "WINEPREFIX/drive_c/IINACT.exe";
 
+    public List<string> AutoRun { get; set; } = new();
+
     public string XlCorePath { get; set; } = string.Empty;
 
     public bool WineEsync { get; set; } = true;

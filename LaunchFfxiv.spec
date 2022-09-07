@@ -25,6 +25,12 @@ dotnet publish -r linux-x64 -c Release -p:PublishReadyToRun=true -p:PublishSingl
 mv LaunchFfxiv/bin/Release/net6.0/linux-x64/publish/LaunchFfxiv /opt
 
 
+%files
+%{_bindir}/LaunchFfxiv
+LaunchFfxiv
+%license LICENSE.md
+
+
 %changelog
 * Tue Sep 06 2022 Joker <amathor929@gmail.com>
 - 
