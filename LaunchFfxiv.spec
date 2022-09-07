@@ -26,7 +26,7 @@ mv LaunchFfxiv/bin/Release/net6.0/linux-x64/publish/LaunchFfxiv /opt/LaunchFfxiv
 ls /opt
 
 %files
-/opt/LaunchFfxiv
+/LaunchFfxiv/bin/Release/net6.0/linux-x64/publish/LaunchFfxiv
 %license LICENSE.md
 
 
