@@ -22,11 +22,10 @@ dotnet publish -r linux-x64 -c Release -p:PublishReadyToRun=true -p:PublishSingl
 
 
 %install
-mv LaunchFfxiv/bin/Release/net6.0/linux-x64/publish/LaunchFfxiv ~/
+mv LaunchFfxiv/bin/Release/net6.0/linux-x64/publish/LaunchFfxiv /opt
 
 
 %files
-LaunchFfxiv/bin/Release/net6.0/linux-x64/publish/LaunchFfxiv
 %license LICENSE.md
 
 
