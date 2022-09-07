@@ -7,8 +7,7 @@ License:        CC-BY-SA3
 URL:            https://github.com/joker-119/LaunchFfxiv
 Source0:        %{name}-%{version}.tar.gz
 
-BuildRequires: dotnet
-BuildRequires: nuget
+BuildRequires: dotnet-sdk-6.0
 #Requires:
 
 %description
