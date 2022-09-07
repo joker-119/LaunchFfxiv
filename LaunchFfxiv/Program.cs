@@ -10,8 +10,10 @@ public class Program
 {
     private const string KCfgFile = "LaunchFfxivConfig.json";
     private static Config? config;
+    private static List<Process?> backgroundProcesses = new();
 
     public static Config Config => config ??= GetConfig();
+    
 
     public static void Main(string[] args)
     {
@@ -239,7 +241,7 @@ public class Program
         Log.Info("Startup", "Starting RPCAPD");
         try
         {
-            Process.Start(Config.RpcapdPath, "-l localhost -n"); // Listen on localhost only with no password auth.
+            backgroundProcesses.Add(Process.Start(Config.RpcapdPath, "-l localhost -n")); // Listen on localhost only with no password auth.
         }
         catch (Exception)
         {
@@ -257,7 +259,7 @@ public class Program
             try
             {
                 if (autoRun.EndsWith(".exe"))
-                    Process.Start(SetupWineProcessInfo(autoRun));
+                    backgroundProcesses.Add(Process.Start(SetupWineProcessInfo(autoRun)));
                 else
                 {
                     if (autoRun.Contains(' '))
@@ -267,10 +269,10 @@ public class Program
                         foreach (string s in split.Skip(1))
                             args += $"{s} ";
                         args = args.TrimEnd(' ');
-                        Process.Start(split[0], args);
+                        backgroundProcesses.Add(Process.Start(split[0], args));
                     }
                     else
-                        Process.Start(autoRun);
+                        backgroundProcesses.Add(Process.Start(autoRun));
                 }
             }
             catch (Exception e)
@@ -281,6 +283,9 @@ public class Program
         }
         
         iinact?.WaitForExit(); // Wait for IINACT to die, before killing rpcapd
+        foreach (Process? process in backgroundProcesses)
+            process?.Kill(true);
+
         Process.Start("pkill", "-9 rpcapd");
         Log.Info("Program", "Good job, Kupo!");
     }
