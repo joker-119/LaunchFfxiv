@@ -182,7 +182,7 @@ public class Program
         }
         else // If we're using the native launcher, we want to make sure our WINE usage matches the launcher's to make everything work
         {
-            string launcherConfig = Path.Combine(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".xlcore"), "launcher.ini");
+            string launcherConfig = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".xlcore", "launcher.ini");
             if (!File.Exists(launcherConfig))
             {
                 Log.Error("Startup - XLCORE", $"Native XLCore detected, but unable to load XLCore Launcher ini file from {launcherConfig}. Please run XLCore once first to generate it's config.");
@@ -202,9 +202,9 @@ public class Program
                         Config.WineFsync = s.EndsWith("true");
                         break;
                     case { } when s.StartsWith("WineStartupType") && s.EndsWith("Managed"): // If the launcher is managing wine for the game client, we need to change our wine binary path to be the same as what's used by the launcher
-                        foreach (string dir in Directory.GetDirectories(Path.Combine(Path.Combine(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".xlcore"), "compatibilitytool"), "beta"), "wine*"))
+                        foreach (string dir in Directory.GetDirectories(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".xlcore", "compatibilitytool", "beta"), "wine*"))
                         {
-                            Config.WinePath = Path.Combine(Path.Combine(dir, "bin"), "wine");
+                            Config.WinePath = Path.Combine(dir, "bin", "wine");
                             changedWinePath = true;
                             Log.Info("Startup - XLCORE", Config.WinePath);
                             break;
@@ -219,7 +219,7 @@ public class Program
                 }
             }
 
-            Config.WinePrefixPath = Path.Combine(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".xlcore"), "wineprefix");
+            Config.WinePrefixPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".xlcore", "wineprefix");
             Config.IinactPath = Config.IinactPath.Replace("WINEPREFIX", Config.WinePrefixPath);
             SaveConfig();
 
