@@ -250,9 +250,10 @@ public class Program
 
         Log.Info("Startup", "Starting IINACT");
         ProcessStartInfo iinactInfo = SetupWineProcessInfo(Config.IinactPath);
-        iinactInfo.EnvironmentVariables["DOTNET_BUNDLE_EXTRACT_BASE_DIR"] = ""; // dotnet6 apps require this env variable to be set. For some reason, WINE is not properly inheriting the default location when this env variable is not set.
+        iinactInfo.EnvironmentVariables["DOTNET_BUNDLE_EXTRACT_BASE_DIR"] = $@"Z:\\home\{Environment.UserName}\.cache"; // wine does not interpolate this env variable into a windows-readable path
+        iinactInfo.EnvironmentVariables["DOTNET_ROOT"] = @"C:\\Program Files\dotnet\";
         Process? iinact = Process.Start(iinactInfo);
-        
+
         Log.Info("Startup", "Starting auto-run processes..");
         foreach (string autoRun in Config.AutoRun)
         {
@@ -282,6 +283,7 @@ public class Program
             }
         }
         
+        Thread.Sleep(10000);
         iinact?.WaitForExit(); // Wait for IINACT to die, before killing rpcapd
         foreach (Process? process in backgroundProcesses)
             process?.Kill(true);
